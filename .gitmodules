@@ -1,0 +1,6 @@
+[submodule "external/godot-cpp"]
+	path = external/godot-cpp
+	url = https://github.com/godotengine/godot-cpp
+[submodule "external/cppscript"]
+	path = external/cppscript
+	url = https://github.com/IvanInventor/godot-cppscript
