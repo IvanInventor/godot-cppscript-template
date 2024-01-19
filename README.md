@@ -10,13 +10,13 @@ git clone https://github.com/IvanInventor/godot-cppscript-template --recurse-sub
 cd godot-project
 ```
 ### Prepare godot-cpp repo
-  > **NOTE: CMake config currently works only from my cmake rewrite of godot-cpp**
+  > **NOTE: CMake config currently works only from my [cmake rewrite](https://github.com/godotengine/godot-cpp/pull/1355) of godot-cpp**
   > You can still use it with any Godot >= 4.1 version, if you
   > - switch godot-cpp submodule to rewrite branch
   >   ```bash
   >   git submodule set-url external/godot-cpp https://github.com/IvanInventor/godot-cpp
   >   git submodule set-branch --branch cmake-rewrite external/godot-cpp
-  >   git submodule update external/godot-cpp
+  >   git submodule update --remote external/godot-cpp
   >   ```
   > - generate custom bindings from you binary (from [guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html#building-the-c-bindings)):
   >   ```bash
@@ -24,6 +24,8 @@ cd godot-project
   >   ./your_godot_executable --dump-extension-api
   >   mv extension_api.json external/godot-cpp/gdextension/extension_api.json
   >   ```
+  > - Skip to building step
+
 - Checkout your version of godot
 	- For stable releases: checkout one of [tags](https://github.com/godotengine/godot-cpp/tags)
 	```bash
@@ -52,7 +54,7 @@ cd godot-project
   cmake -Bbuild
   cmake --build build
   ```
-- Open godot-project/project directory from Godot
+- Open `project` directory from Godot
 - Run scene
 
   You should see line of text in the center of screen and message in console
