@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(scripts LANGUAGES CXX)
 
-#set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel")
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel")
 set(GODOT_CPP_PATH external/godot-cpp)	# path to godot-cpp repository
 
 add_subdirectory(${GODOT_CPP_PATH})
