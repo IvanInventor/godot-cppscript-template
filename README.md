@@ -61,7 +61,7 @@ cd godot-project
 
 # Customizing
 - Project name
-  - [Regenerate](https://github.com/IvanInventor/godot-cppscript/blob/master/README.md#generate-files) cpspcript files with name of your project
+  - [Regenerate](https://github.com/IvanInventor/godot-cppscript/tree/master#generate-files) cpspcript files with name of your project
   - Remove old `project/scripts.gdextension` file
   - Modify builder scripts
     - Scons
