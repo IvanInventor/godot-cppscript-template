@@ -1,17 +1,87 @@
-[gd_scene load_steps=2 format=3 uid="uid://dv3qg4671luep"]
+[gd_scene load_steps=3 format=3 uid="uid://dv3qg4671luep"]
 
 [ext_resource type="Script" path="res://Example.gd" id="1_f84pj"]
+[ext_resource type="Script" path="res://Sprite2D.gd" id="2_lrddn"]
 
 [node name="Example" type="Example"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -11.5
-offset_right = 20.0
-offset_bottom = 11.5
-grow_horizontal = 2
-grow_vertical = 2
+barr = PackedByteArray(64, 64, 6, 0, 0, 0, 0)
 script = ExtResource("1_f84pj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(183, 171)
+script = ExtResource("2_lrddn")
+
+[node name="Example" type="Example" parent="."]
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+offset_right = 170.0
+offset_bottom = 298.0
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer"]
+custom_minimum_size = Vector2(0, 600)
+layout_mode = 2
+columns = 4
+
+[node name="Label4" type="Label" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "        "
+
+[node name="Label" type="Label" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "Col 1"
+
+[node name="Label2" type="Label" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "Col 2"
+
+[node name="Label3" type="Label" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "Col 2"
+
+[node name="Label5" type="Label" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "Row 1"
+
+[node name="LineEdit" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text1"
+
+[node name="LineEdit2" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text2"
+
+[node name="LineEdit3" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text3"
+
+[node name="Label6" type="Label" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "Row 2"
+
+[node name="LineEdit4" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text1"
+
+[node name="LineEdit5" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text2"
+
+[node name="LineEdit6" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text3"
+
+[node name="Label7" type="Label" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "Row 3"
+
+[node name="LineEdit7" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text1"
+
+[node name="LineEdit8" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text2"
+
+[node name="LineEdit9" type="LineEdit" parent="ScrollContainer/GridContainer"]
+layout_mode = 2
+text = "text3"

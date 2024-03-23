@@ -8,8 +8,9 @@ set(GODOT_CPP_PATH external/godot-cpp)	# path to godot-cpp repository
 add_subdirectory(${GODOT_CPP_PATH})
 
 # Get Sources
-file(GLOB_RECURSE SOURCES src/*.c**)
-file(GLOB_RECURSE HEADERS src/*.h**)
+file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.c**)
+file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.h**)
+message(${SOURCES})
 
 # Define our godot-cpp library
 if(${PLATFORM} STREQUAL "WEB")
@@ -41,6 +42,7 @@ get_directory_property(GODOT_CXX_FLAGS DIRECTORY ${GODOT_CPP_PATH} DEFINITION GO
 target_compile_options(${PROJECT_NAME} PRIVATE
 	${GODOT_CC_FLAGS}
 	${GODOT_CXX_FLAGS}
+	-fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}=
 )
 
 get_directory_property(GODOT_LINK_FLAGS DIRECTORY ${GODOT_CPP_PATH} DEFINITION GODOT_LINK_FLAGS)

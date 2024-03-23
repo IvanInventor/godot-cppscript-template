@@ -4,7 +4,4 @@
 
 using namespace godot;
 
-void Example::do_something() {
-	set_text("Check console");
-	UtilityFunctions::print("GDExtension working!");
-}
+
