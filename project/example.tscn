@@ -11,8 +11,6 @@ script = ExtResource("1_f84pj")
 position = Vector2(183, 171)
 script = ExtResource("2_lrddn")
 
-[node name="Example" type="Example" parent="."]
-
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 offset_right = 170.0
 offset_bottom = 298.0
@@ -85,3 +83,12 @@ text = "text2"
 [node name="LineEdit9" type="LineEdit" parent="ScrollContainer/GridContainer"]
 layout_mode = 2
 text = "text3"
+
+[node name="GInput" type="GInput" parent="."]
+anchors_preset = -1
+anchor_right = 0.219
+anchor_bottom = 0.159
+offset_left = 312.0
+offset_top = 151.0
+offset_right = 287.712
+offset_bottom = 284.968

@@ -38,7 +38,10 @@
 
 #include <godot_cpp/classes/image.hpp>
 
+#include <godot_cpp/classes/tree.hpp>
+
 #include "callable_lambda.hpp"
+#include <godot_cpp/variant/utility_functions.hpp>
 
 class MyRes : public godot::Resource {
 	GCLASS(MyRes, godot::Resource);
@@ -114,6 +117,12 @@ public:
 	}
 
 	void _input(const godot::Ref<godot::InputEvent>& ev) override {
+		std::vector<uint8_t> data(10, 3);
+		godot::PackedByteArray packet;
+		packet.resize(data.size());
+		std::memcpy(packet.ptrw(), data.data(), data.size());
+		godot::UtilityFunctions::print(packet);
+
 		int i = 42;
 		if(godot::Input::get_singleton()->is_action_just_pressed(SNAME("act"))) {
 			auto timer = get_tree()->create_timer(1);
@@ -121,9 +130,17 @@ public:
 				"timeout",
 				create_custom_callable_lambda(this, [=](int arg)
 					{
+						WARN_PRINT("STRINGGGGGGGGG");
+						godot::UtilityFunctions::print("Warning\n""\x20\x20\x20""at: ggg (secec.main.cpp)");
+						godot::UtilityFunctions::print_rich("[color=yellow]* Warning");
+						/*
 						godot::UtilityFunctions::print("Called before process, i = ", i, ", arg = ", arg);
 						godot::Array list = timer->get_signal_connection_list("timeout");
 						godot::UtilityFunctions::print(godot::Callable(godot::Dictionary(list[0])["callable"]));
+						Node* child = find_child("Label2");
+						ERR_FAIL_NULL(child);
+						child->print_tree();
+						*/
 
 					})
 				.bind(100),
@@ -131,7 +148,6 @@ public:
 
 				get_viewport()->set_input_as_handled();
 		}
-
 	}
 
 	GIGNORE();
@@ -142,10 +158,42 @@ public:
 	GCLASS(Example, godot::Node);
 };
 
+class GInput : public godot::Tree {
+public:
+	void _gui_input(const godot::Ref<godot::InputEvent>& event) override {
+		godot::UtilityFunctions::print(event);
+		if(event->is_pressed()) {};
+	}
+
+	GCLASS(GInput, godot::Tree);
+};
+
 
 class Plug : public godot::EditorPlugin {
 	GEDITOR_PLUGIN();
 
+public:
+	Plug() {
+		godot::UtilityFunctions::print("Plugin Enabled");
+	}
+
+	godot::String _get_plugin_name() const override {
+		return "PluginName";
+	}
+	void _enable_plugin() override {
+		godot::UtilityFunctions::print("Plugin Enabled");
+	}
+
 	GCLASS(Plug, godot::EditorPlugin);
+};
+
+class CT : public godot::Node {
+	GCLASS(CT, godot::Node);
+
+	CT() {
+		if(godot::Engine::get_singleton()->is_editor_hint())
+			return;
+		godot::UtilityFunctions::print("Constructed");
+	}
 };
 
