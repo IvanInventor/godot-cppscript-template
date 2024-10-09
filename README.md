@@ -11,6 +11,7 @@ cd godot-project
 ```
 ### Prepare godot-cpp repo
   > **NOTE: CMake config currently works only from my [cmake rewrite](https://github.com/godotengine/godot-cpp/pull/1355) of godot-cpp**
+  >
   > **If you want to use cmake for Godot before 4.4 dev branch, do 'For custom builds' step below**
 
 - Checkout your version of godot
