@@ -1,6 +1,5 @@
 import os, sys
-sys.path.append('external/cppscript')
-from cppscript import create_cppscript_target, GlobRecursive
+from external.cppscript.godot_cppscript import create_cppscript_target, GlobRecursive
 
 # Customize this values depending on your project
 library_name = 'scripts'
@@ -45,7 +44,7 @@ generated = create_cppscript_target(
 		## C++ defines (TOOLS_ENABLED, DEBUG_METHODS etc.)
 		## Enable, if you conditionally enable classes/members
 		## based on definitions
-		#'compile_defs' : env['CPPDEFINES'],
+		'compile_defs' : env['CPPDEFINES'],
 		#
 		## Include paths
 		## (Try to avoid godot-cpp headers paths,
@@ -54,6 +53,8 @@ generated = create_cppscript_target(
 		}
 )
 
+# Include headers path (if not done already)
+env.Append(CPPPATH=SRC_DIR)
 ###############################
 
 if env["platform"] == "macos":
