@@ -11,20 +11,7 @@ cd godot-project
 ```
 ### Prepare godot-cpp repo
   > **NOTE: CMake config currently works only from my [cmake rewrite](https://github.com/godotengine/godot-cpp/pull/1355) of godot-cpp**
-  > You can still use it with any Godot >= 4.1 version, if you
-  > - switch godot-cpp submodule to rewrite branch
-  >   ```bash
-  >   git submodule set-url external/godot-cpp https://github.com/IvanInventor/godot-cpp
-  >   git submodule set-branch --branch cmake-rewrite external/godot-cpp
-  >   git submodule update --remote external/godot-cpp
-  >   ```
-  > - generate custom bindings from you binary (from [guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html#building-the-c-bindings)):
-  >   ```bash
-  >   # Generate custom bindings
-  >   ./your_godot_executable --dump-extension-api
-  >   mv extension_api.json external/godot-cpp/gdextension/extension_api.json
-  >   ```
-  > - Skip to building step
+  > **If you want to use cmake for Godot before 4.4 dev branch, do 'For custom builds' step below**
 
 - Checkout your version of godot
 	- For stable releases: checkout one of [tags](https://github.com/godotengine/godot-cpp/tags)
@@ -32,18 +19,26 @@ cd godot-project
 	cd external/godot-cpp/
 	git checkout <tag>
 	```
-	OR
+	**OR**
 	- For custom builds (from [guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html#building-the-c-bindings)):
 	```bash
-	# switch to branch corresponding to godot version
-	# Godot 4.1.3 -> 4.1
-	cd external/godot-cpp/
-	git pull origin 4.1
-	git switch 4.1
 	# Generate custom bindings
 	./your_godot_executable --dump-extension-api
-	mv extension_api.json gdextension/extension_api.json
-	```
+ 	```
+	- And then:
+
+  		- Move file to default path
+		```bash
+ 		mv extension_api.json gdextension/extension_api.json
+		```
+ 
+ 	 	**OR**
+  
+ 		- Specify custom path to file to either scons or cmake
+ 		```bash
+  		scons custom_api_file=path/to/extension_api.json
+ 		cmake -DGODOT_CUSTOM_API_FILE=path/to/extension_api.json```
+		```
 - Build project
   - Scons
   ```bash
@@ -87,6 +82,7 @@ cd godot-project
     ```diff
     # Name of header to be included to enable cppscript
     # (Prefer name unique to your project)
-    -cppscript.h
-    +your_name.h
+    HEADER_NAME
+    -    cppscript.h
+    +    your_name.h
     ```
