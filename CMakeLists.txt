@@ -1,107 +1,78 @@
-# TEMPORARILY works only on top of my godot-cpp Cmake rewrite
-cmake_minimum_required(VERSION 3.13)
-project(scripts LANGUAGES CXX)
+# Using the same minimum as the godot-cpp project
+cmake_minimum_required(VERSION 3.17)
 
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel")
-set(GODOT_CPP_PATH external/godot-cpp)	# path to godot-cpp repository
+# Silence unused variable warning when specified from toolchain
+if(CMAKE_C_COMPILER)
+endif()
 
-add_subdirectory(${GODOT_CPP_PATH})
+set(LIBNAME "cppscript_example_name") # "The name of the library"
+set(GODOT_PROJECT_DIR "project" CACHE STRING "The directory of a Godot project folder")
 
-# Get Sources
+# Make sure all the dependencies are satisfied
+find_package(Python3 3.4 REQUIRED)
+
+add_subdirectory(external/godot-cpp SYSTEM)
+
+# When compiling for emscripten, this toolchainhack needs to be included.
+# set(CMAKE_PROJECT_<project-name>_INCLUDE ${godot-cpp_SOURCE_DIR}/cmake/emsdkHack.cmake)
+
+# Create the gen directory at configure time so IDEs can see generated headers immediately after generate_bindings
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/godot-cpp/gen/include")
+
+# Add godot-cpp's module path and include the exported functions.
+# This is made available for documentation generation
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${godot-cpp_SOURCE_DIR}/cmake")
+include(GodotCPPModule)
+
+# The godot-cpp target has some of useful properties attached that can be retrieved like so.
+get_target_property(GODOTCPP_SUFFIX godot::cpp GODOTCPP_SUFFIX)
+get_target_property(GODOTCPP_PLATFORM godot::cpp GODOTCPP_PLATFORM)
+
+# Now we can specify our own project which will inherit any global cmake properties or variables that have been defined.
+project(godot-cpp-template
+    VERSION 1.0
+    DESCRIPTION "This repository serves as a quickstart template for GDExtension development with Godot 4.0+."
+    HOMEPAGE_URL "https://github.com/enetheru/godot-cpp-template/tree/main"
+    LANGUAGES CXX
+)
+
+add_library(${LIBNAME} SHARED)
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.c**)
-file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS src/*.h**)
-
-godot_clear_default_flags()
-
-get_target_property(LIBRARY_SUFFIX godot-cpp LIBRARY_SUFFIX)
-
-if("${GODOT_TARGET}" STREQUAL "editor" OR "${GODOT_TARGET}" STREQUAL "template_debug")
-	set(DOC_GEN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/gen/doc_data.gen.cpp")
-	file(GLOB_RECURSE DOC_FILES CONFIGURE_DEPENDS doc_classes/*.xml)
-
-	godot_make_doc(
-		DESTINATION ${DOC_GEN_PATH}
-		SOURCES ${DOC_FILES}
-		COMPRESSION Z_BEST_COMPRESSION
-	)
-	list(APPEND SOURCES ${DOC_GEN_PATH})
-endif()
-
-# Define our godot-cpp library
-if("${GODOT_PLATFORM}" STREQUAL "web")
-	# wasm libraries loaded with dlopen() are created like this in cmake
-	add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-	set_target_properties(${PROJECT_NAME}
-		PROPERTIES
-			SUFFIX ".wasm"
-			OUTPUT_NAME "${PROJECT_NAME}${LIBRARY_SUFFIX}"
-	)
-elseif("${GODOT_PLATFORM}" STREQUAL "macos")
-	add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
-	set(OUTPUT_NAME "lib${PROJECT_NAME}${LIBRARY_SUFFIX}")
-	set_target_properties(${PROJECT_NAME} PROPERTIES
-		FRAMEWORK TRUE
-		MACOSX_FRAMEWORK_IDENTIFIER "org.godotengine.lib${PROJECT_NAME}"
-		MACOSX_BUNDLE_BUNDLE_NAME "lib${PROJECT_NAME}${LIBRARY_SUFFIX}"
-		MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0"
-		MACOS_BUNDLE_BUNDLE_VERSION "1.0.0"
-
-		OUTPUT_NAME "${OUTPUT_NAME}"
-	)
-
-	# Workaround of 'bin/***.framework/Resources' existing in godot-cpp repo by default'
-	set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/project/bin/${OUTPUT_NAME}.framework/Resources")
-	if(IS_DIRECTORY ${RESOURCES_DIR} AND NOT IS_SYMLINK ${RESOURCES_DIR})
-		message(STATUS "Removing '${RESOURCES_DIR}' to create symlink ...")
-		file(REMOVE_RECURSE ${RESOURCES_DIR})
-	endif()
-
-# TODO: IOS configuration
-#elseif("${GODOT_PLATFORM}" STREQUAL "ios")
-else()
-	add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
-	set_target_properties(${PROJECT_NAME} PROPERTIES
-		OUTPUT_NAME "${PROJECT_NAME}${LIBRARY_SUFFIX}"
-)
-endif()
-
-target_link_libraries(${PROJECT_NAME} PUBLIC godot-cpp)
-
-get_target_property(GODOT_C_FLAGS godot-cpp GODOT_C_FLAGS)
-get_target_property(GODOT_CXX_FLAGS godot-cpp GODOT_CXX_FLAGS)
-get_target_property(GODOT_COMPILE_WARNING_FLAGS godot-cpp GODOT_COMPILE_WARNING_FLAGS)
-target_compile_options(${PROJECT_NAME} PRIVATE
-	${GODOT_C_FLAGS}
-	${GODOT_CXX_FLAGS}
-	${GODOT_COMPILE_WARNING_FLAGS}
+target_sources(${LIBNAME}
+    PRIVATE
+    ${SOURCES}
 )
 
-get_target_property(GODOT_LINK_FLAGS godot-cpp GODOT_LINK_FLAGS)
-target_link_options(${PROJECT_NAME} PRIVATE ${GODOT_LINK_FLAGS})
+# Fetch a list of the xml files to use for documentation and add to our target
+file(GLOB_RECURSE DOC_XML LIST_DIRECTORIES NO CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/doc_classes/*.xml")
 
-
-get_target_property(LIBRARY_SUFFIX godot-cpp LIBRARY_SUFFIX)
-set_target_properties(${PROJECT_NAME}
-	PROPERTIES
-		PREFIX "lib"
-		LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-		RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-)
-
-if(${GODOT_WARNING_AS_ERROR})
-	set_warning_as_error(${PROJECT_NAME})
+# conditionally add doc data to compile output
+if(DOC_XML)
+    if(GODOTCPP_TARGET MATCHES "editor|template_debug")
+        target_doc_sources(${LIBNAME} "${DOC_XML}")
+    endif()
 endif()
 
-###############################
-# godot-cppscript creation
+target_link_libraries(${LIBNAME} PRIVATE godot-cpp)
+
+# Require at least C++17 for this target
+set_property(TARGET ${LIBNAME} PROPERTY CXX_STANDARD 17)
+
+set_target_properties(${LIBNAME}
+    PROPERTIES
+    # The generator expression here prevents msvc from adding a Debug or Release subdir.
+    RUNTIME_OUTPUT_DIRECTORY "$<1:${PROJECT_SOURCE_DIR}/../bin/${GODOTCPP_PLATFORM}>"
+
+    PREFIX ""
+    OUTPUT_NAME "${LIBNAME}${GODOTCPP_SUFFIX}"
+)
+
+set(GODOT_PROJECT_BINARY_DIR "${PROJECT_SOURCE_DIR}/${GODOT_PROJECT_DIR}/../bin/${GODOTCPP_PLATFORM}")
+
+add_custom_command(TARGET ${LIBNAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${LIBNAME}>" "${GODOT_PROJECT_BINARY_DIR}/lib$<TARGET_FILE_NAME:${LIBNAME}>"
+)
 
 # Include module
 include(${CMAKE_CURRENT_SOURCE_DIR}/external/cppscript/godot_cppscript.cmake)
@@ -139,22 +110,23 @@ create_cppscript_target(
 	# based on definitions
 	#
 	 COMPILE_DEFS
-	 	$<TARGET_PROPERTY:${PROJECT_NAME},COMPILE_DEFINITIONS>
+	 	$<TARGET_PROPERTY:${LIBNAME},COMPILE_DEFINITIONS>
 
 	# Include paths
 	# (Try to avoid godot-cpp headers paths,
 	# it slows parsing drastically)
 	#
 	# INCLUDE_PATHS
-	# 	$<TARGET_PROPERTY:${PROJECT_NAME},INCLUDE_DIRECTORIES>
+	# 	$<TARGET_PROPERTY:${LIBNAME},INCLUDE_DIRECTORIES>
 )
 
 # Add sources to your target
-target_sources(${PROJECT_NAME} PRIVATE ${GEN_SOURCES})
+target_sources(
+    ${LIBNAME}
+	 PRIVATE ${GEN_SOURCES}
+)
 
 # Include headers path (if not done already)
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${LIBNAME} PRIVATE
 	src
 )
-###############################
-

@@ -10,22 +10,6 @@ git clone https://github.com/IvanInventor/godot-cppscript-template --recurse-sub
 cd godot-project
 ```
 ### Prepare godot-cpp repo
-  > **NOTE: CMake config currently works only from my [cmake rewrite](https://github.com/godotengine/godot-cpp/pull/1355) of godot-cpp**
-  > You can still use it with any Godot >= 4.1 version, if you
-  > - switch godot-cpp submodule to rewrite branch
-  >   ```bash
-  >   git submodule set-url external/godot-cpp https://github.com/IvanInventor/godot-cpp
-  >   git submodule set-branch --branch cmake-rewrite external/godot-cpp
-  >   git submodule update --remote external/godot-cpp
-  >   ```
-  > - generate custom bindings from you binary (from [guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html#building-the-c-bindings)):
-  >   ```bash
-  >   # Generate custom bindings
-  >   ./your_godot_executable --dump-extension-api
-  >   mv extension_api.json external/godot-cpp/gdextension/extension_api.json
-  >   ```
-  > - Skip to building step
-
 - Checkout your version of godot
 	- For stable releases: checkout one of [tags](https://github.com/godotengine/godot-cpp/tags)
 	```bash
@@ -47,11 +31,11 @@ cd godot-project
 - Build project
   - Scons
   ```bash
-  scons
+  scons api_version=4.7
   ```
   - CMake
   ```bash
-  cmake -Bbuild
+  cmake -Bbuild -DGODOTCPP_API_VERSION=4.7
   cmake --build build
   ```
 - Open `project` directory from Godot
@@ -61,20 +45,19 @@ cd godot-project
 
 # Customizing
 - Project name
-  - [Regenerate](https://github.com/IvanInventor/godot-cppscript/tree/master#generate-files) cpspcript files with name of your project
-  - Remove old `project/scripts.gdextension` file
-  - Modify builder scripts
-    - Scons
-      ```diff
-      # Customize this values depending on your project
-      -library_name = 'scripts'
-      +library_name = '<your_name>'
-      ```
-    - Cmake
-      ```diff
-      -project(scripts LANGUAGES CXX)
-      +project(your_name LANGUAGES CXX)
-      ```
+  - Rename with oneliner script (cppscript_example_name -> your_name)
+    - Bash (non-Windows)
+```bash
+NEWNAME="your_name"; mv "project/cppscript_example_name.gdextension" "project/$NEWNAME.gdextension" && find project -type f -exec sed -i "s/cppscript_example_name/$NEWNAME/g" {} + && sed -i "s/cppscript_example_name/$NEWNAME/g" CMakeLists.txt SConstruct
+```
+    - PowerShell (Windows)
+```powershell
+$NEWNAME="your_name"; Move-Item "project/cppscript_example_name.gdextension" "project/$NEWNAME.gdextension"; Get-ChildItem project -File -Recurse | ForEach-Object { (Get-Content $_.FullName -Raw) -replace 'cppscript_example_name',[regex]::Escape($NEWNAME) | Set-Content $_.FullName }; Get-ChildItem CMakeLists.txt,SConstruct | ForEach-Object { (Get-Content $_.FullName -Raw) -replace 'cppscript_example_name',[regex]::Escape($NEWNAME) | Set-Content $_.FullName }
+```
+  OR
+  - Manually:
+    - Rename project/cppscript_example_name.gdextension -> project/your_name.gdextension
+    - Replace all occurences of `cppscript_example_name` in `src/`,`CMakeLists.txt`,`SConstruct`
 - Header name ([why?](https://github.com/IvanInventor/godot-cppscript/wiki/General-info#why-unique-header-name-over-cppscripth-is-preferred))
   - SCons
     ```diff
