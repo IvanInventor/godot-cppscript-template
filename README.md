@@ -1,3 +1,5 @@
+**[Main project](https://github.com/IvanInventor/godot-cppscript) | [Documentation](https://github.com/IvanInventor/godot-cppscript/wiki) | [Usage example](#usage-example)**
+
 # godot-cppscript-template
 Minimalistic template project to start with GDExtension development with godot-cppscript preinstalled.
 
